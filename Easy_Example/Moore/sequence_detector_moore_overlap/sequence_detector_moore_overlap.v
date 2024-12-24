@@ -1,58 +1,45 @@
-module sequence_detector_moore_overlap (
-    input wire clk,        // 时钟信号
-    input wire reset,      // 异步复位信号
-    input wire in,         // 输入序列
-    output reg out         // 输出，序列检测结果
+module moore_sequence_detector_overlap(
+    input wire clk,
+    input wire reset,
+    input wire din,          // 输入位流
+    output reg dout          // 输出，1 表示检测到序列 1101
 );
 
-    // 定义状态
-    typedef enum reg [1:0] {
-        S0 = 2'b00, // 初始状态
-        S1 = 2'b01, // 接收到第一个1
-        S2 = 2'b10, // 接收到11
-        S3 = 2'b11  // 接收到110
-    } state_t;
+    // 状态定义
+    parameter S0 = 3'b000;  // 初始状态
+    parameter S1 = 3'b001;  // 检测到 1
+    parameter S2 = 3'b010;  // 检测到 11
+    parameter S3 = 3'b011;  // 检测到 110
+    parameter S4 = 3'b100;  // 检测到 1101
 
-    state_t state, next_state;
+    reg [2:0] current_state, next_state; // 3 位状态寄存器
 
-    // 状态机状态转换
+    // 状态寄存器
     always @(posedge clk or posedge reset) begin
         if (reset)
-            state <= S0;    // 复位时回到初始状态
+            current_state <= S0;
         else
-            state <= next_state;  // 否则，进入下一个状态
+            current_state <= next_state;
     end
 
     // 状态转移逻辑
     always @(*) begin
-        case (state)
-            S0: begin
-                next_state = (in) ? S1 : S0; // 如果输入是1，进入S1，否则保持S0
-            end
-            S1: begin
-                next_state = (in) ? S2 : S0; // 如果输入是1，进入S2，否则回到S0
-            end
-            S2: begin
-                next_state = (in) ? S1 : S3; // 如果输入是1，回到S1，否则进入S3
-            end
-            S3: begin
-                next_state = (in) ? S2 : S0; // 如果输入是1，进入S2，否则回到S0
-            end
-            default: begin
-                next_state = S0;
-            end
+        case (current_state)
+            S0: next_state = din ? S1 : S0;  // 初始状态
+            S1: next_state = din ? S2 : S0;  // 检测到 1
+            S2: next_state = din ? S2 : S3;  // 检测到 11
+            S3: next_state = din ? S4 : S0;  // 检测到 110
+            S4: next_state = din ? S2 : S0;  // 检测到 1101，重叠检测返回 S2
+            default: next_state = S0;        // 默认返回初始状态
         endcase
     end
 
-    // 输出逻辑（Moore 型状态机）
-    always @(state) begin
-        case (state)
-            S0: out = 0; // 初始状态，输出为0
-            S1: out = 0; // 接收到第一个1，输出为0
-            S2: out = 0; // 接收到11，输出为0
-            S3: out = 1; // 接收到110，输出为1
-            default: out = 0;
-        endcase
+    // 输出逻辑：仅在状态 S4 输出 1
+    always @(posedge clk or posedge reset) begin
+        if (reset)
+            dout <= 0;
+        else
+            dout <= (current_state == S4);
     end
 
 endmodule
