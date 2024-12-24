@@ -5,7 +5,7 @@ module lif_neuron #(
 ) (
     input wire clk,
     input wire reset,
-    input wire [15:0] I_in,    // 输入电流
+    input wire [15:0] I_in,    // 输入电流 (16 位)
     output reg spike,          // 脉冲输出
     output reg [15:0] V_out    // 膜电位输出
 );
@@ -30,6 +30,8 @@ module lif_neuron #(
         end
     end
 
-    assign V_out = V_mem;
+    always @(posedge clk) begin
+        V_out <= V_mem;  // 同步更新膜电位输出
+    end
 
 endmodule

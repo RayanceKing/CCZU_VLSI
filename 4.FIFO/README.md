@@ -55,8 +55,8 @@
 
 1. 编译 Verilog 代码：
    ```bash
-   iverilog -o sync_fifo_tb sync_fifo.v tb_sync_fifo.v
-   iverilog -o async_fifo_tb async_fifo.v tb_async_fifo.v
+   iverilog -o sync_fifo_tb sync_fifo.v sync_fifo_tb.v
+   iverilog -o async_fifo_tb async_fifo.v async_fifo_tb.v
    ```
 
 2. 运行仿真：

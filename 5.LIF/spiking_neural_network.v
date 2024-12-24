@@ -26,7 +26,7 @@ module spiking_neural_network #(
             ) hidden_neuron (
                 .clk(clk),
                 .reset(reset),
-                .I_in(inputs[i % NUM_INPUTS]),
+                .I_in({16{inputs[i % NUM_INPUTS]}}), // 扩展输入信号为 16 位
                 .spike(hidden_spikes[i]),
                 .V_out()
             );
@@ -43,7 +43,7 @@ module spiking_neural_network #(
             ) output_neuron (
                 .clk(clk),
                 .reset(reset),
-                .I_in(hidden_spikes[i % NUM_HIDDEN]),
+                .I_in({16{hidden_spikes[i % NUM_HIDDEN]}}), // 扩展输入信号为 16 位
                 .spike(output_spikes[i]),
                 .V_out()
             );
