@@ -1,5 +1,4 @@
-*.vdc
-wave
+*.vcd
 
 # macOS
 .DS_Store
