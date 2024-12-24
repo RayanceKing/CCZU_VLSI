@@ -83,6 +83,23 @@ LIF神经元模块计算每个神经元的膜电位，并检测是否达到阈�
 
 6. **仿真时间**：仿真持续200时间单位，之后调用 `$finish` 结束仿真。
 
+### 仿真步骤
+
+1. 编译 Verilog 代码：
+   ```bash
+   iverilog -o spiking_neural_network_tb lif_neuron.v spiking_neural_network.v spiking_neural_network_tb.v
+   ```
+
+2. 运行仿真：
+   ```bash
+   vvp spiking_neural_network_tb
+   ```
+
+3. 打开 VCD 文件查看波形：
+   ```bash
+   gtkwave spiking_neural_network.vcd
+   ```
+
 ### 结果
 
 在仿真结束后，你将得到一个名为 `spiking_neural_network.vcd` 的 VCD 文件。你可以使用波形查看工具（如 GTKWave）打开

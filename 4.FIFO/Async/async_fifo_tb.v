@@ -12,13 +12,13 @@ module tb_async_fifo;
 
     // 实例化异步 FIFO
     async_fifo uut (
-        .write_clk(write_clk),
-        .read_clk(read_clk),
+        .wr_clk(write_clk),
+        .rd_clk(read_clk),
         .reset(reset),
-        .write_en(write_en),
-        .read_en(read_en),
-        .data_in(data_in),
-        .data_out(data_out),
+        .write_enable(write_en),
+        .read_enable(read_en),
+        .write_data(data_in),
+        .read_data(data_out),
         .fifo_full(fifo_full),
         .fifo_empty(fifo_empty)
     );
