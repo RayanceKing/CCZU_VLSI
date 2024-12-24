@@ -1,42 +1,46 @@
-module tb_sequence_detector_moore;
+module testbench;
 
-    reg clk;          // 时钟信号
-    reg reset;        // 复位信号
-    reg in;           // 输入序列
-    wire out;         // 输出序列检测结果
+    reg clk;
+    reg reset;
+    reg din;
+    wire dout;
 
     // 实例化序列检测器
-    sequence_detector_moore uut (
+    moore_sequence_detector uut (
         .clk(clk),
         .reset(reset),
-        .in(in),
-        .out(out)
+        .din(din),
+        .dout(dout)
     );
 
-    // 生成 VCD 文件
-    initial begin
-        $dumpfile("sequence_detector_moore.vcd"); // 指定 VCD 文件名
-        $dumpvars(0, tb_sequence_detector_moore); // 指定记录变量的层次
-    end
+    // 生成时钟信号
+    always #5 clk = ~clk;
 
-    // 时钟生成（周期为 10 单位时间）
     initial begin
+        $dumpfile("moore_sequence_detector.vcd"); // 指定 VCD 文件名
+        $dumpvars(0, testbench);                 // 记录所有变量
+
+        // 初始化信号
         clk = 0;
-        forever #5 clk = ~clk;  // 每 5 单位时间反转时钟
-    end
+        reset = 1;
+        din = 0;
 
-    // 测试向量
-    initial begin
-        $display("in | out");  // 打印标题
+        // 释放复位
+        #10 reset = 0;
 
-        // 初始化
-        reset = 1; in = 0; #10 reset = 0;  // 复位初始化
-        #10 in = 1; #10 in = 1; #10 in = 0; #10 in = 1;  // 测试序列1101
-        #10 in = 1; #10 in = 0; #10 in = 1; #10 in = 0;  // 测试序列1010
-        #10 in = 1; #10 in = 1; #10 in = 0; #10 in = 1;  // 测试序列1101
-        #10 in = 0; #10 in = 1; #10 in = 1; #10 in = 0;  // 测试序列0110
+        // 输入序列：1011101，应该在检测到第二个 1101 时输出 1
+        #10 din = 1;
+        #10 din = 0;
+        #10 din = 1;
+        #10 din = 1;
+        #10 din = 0;
+        #10 din = 1; // 此时检测到第一个 1101
+        #10 din = 1;
+        #10 din = 0;
+        #10 din = 1; // 此时检测到第二个 1101
 
-        $finish; // 结束仿真
+        // 停止仿真
+        #50 $finish;
     end
 
 endmodule
